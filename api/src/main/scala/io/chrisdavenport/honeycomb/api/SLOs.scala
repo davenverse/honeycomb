@@ -44,7 +44,7 @@ object SLOs {
       client.successful(Request[F](Method.DELETE, baseUri / "slos" / dataset / id))
     
     def list: F[List[SLO]] = 
-      client.expect(Request[F](Method.GET, baseUri / "slos" / "dataset"))
+      client.expect(Request[F](Method.GET, baseUri / "slos" / dataset))
   }
 
   case class ModifySLO(name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String)
