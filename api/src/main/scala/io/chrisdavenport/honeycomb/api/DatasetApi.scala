@@ -19,7 +19,7 @@ object DatesetApi {
     client: Client[F],
     apiKey: String,
     dataset: String,
-    baseUri: Uri = uri"https://api.honeycomb.io/1"
+    baseUri: Uri = uri"https://api.honeycomb.io"
   ): DatasetApi[F] = new DatasetApiImplementation(client, apiKey, dataset, baseUri)
 
   private class DatasetApiImplementation[F[_]: Concurrent](

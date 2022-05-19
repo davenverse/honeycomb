@@ -27,7 +27,7 @@ object BurnAlerts {
     client: Client[F],
     apiKey: String, 
     dataset: String,
-    baseUri: Uri = uri"https://api.honeycomb.io/1"
+    baseUri: Uri = uri"https://api.honeycomb.io"
   ): BurnAlerts[F] = new BurnAlertsImpl[F](Api.honeycombClient(client, apiKey), dataset, baseUri)
 
   private class BurnAlertsImpl[F[_]: Concurrent](
@@ -36,20 +36,20 @@ object BurnAlerts {
     baseUri: Uri
   ) extends BurnAlerts[F]{
     def create(sloId: String, exhaustionMinutes: Int): F[BurnAlert] = 
-      client.expectOr(Request[F](Method.GET, baseUri / "burn_alerts" / dataset).withEntity(ModifyBurnAlert(sloId, exhaustionMinutes)))(_.as[BurnAlertError].widen)
+      client.expectOr(Request[F](Method.GET, baseUri / "1" / "burn_alerts" / dataset).withEntity(ModifyBurnAlert(sloId, exhaustionMinutes)))(_.as[BurnAlertError].widen)
 
     def delete(id: String): F[Boolean] = 
-      client.successful(Request[F](Method.DELETE, baseUri / "burn_alerts" / dataset / id))
+      client.successful(Request[F](Method.DELETE, baseUri / "1" / "burn_alerts" / dataset / id))
 
     
     def modify(id: String, exhaustionMinutes: Int): F[BurnAlert] = 
-      client.expectOr(Request[F](Method.PUT, baseUri / "burn_alerts" / dataset / id).withEntity(Json.obj("exhaustion_minutes" -> exhaustionMinutes.asJson)))(_.as[BurnAlertError].widen)
+      client.expectOr(Request[F](Method.PUT, baseUri / "1" / "burn_alerts" / dataset / id).withEntity(Json.obj("exhaustion_minutes" -> exhaustionMinutes.asJson)))(_.as[BurnAlertError].widen)
     
     def get(id: String): F[Option[BurnAlert]] = 
-      client.expectOption(Request[F](Method.GET, baseUri / "burn_alerts" / dataset / id))
+      client.expectOption(Request[F](Method.GET, baseUri / "1" / "burn_alerts" / dataset / id))
     
     def getAllForSLO(sloId: String): F[List[BurnAlert]] = 
-      client.expectOr(Request[F](Method.GET, (baseUri / "burn_alerts" / dataset).withQueryParam("slo_id", sloId)))(_.as[BurnAlertError].widen)
+      client.expectOr(Request[F](Method.GET, (baseUri / "1" / "burn_alerts" / dataset).withQueryParam("slo_id", sloId)))(_.as[BurnAlertError].widen)
     
   }
 

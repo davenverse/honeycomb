@@ -23,7 +23,7 @@ trait SLOs[F[_]]{
 }
 object SLOs {
 
-  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, dataset: String, baseUri: Uri = uri"https://api.honeycomb.io/1"): SLOs[F] = 
+  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, dataset: String, baseUri: Uri = uri"https://api.honeycomb.io"): SLOs[F] = 
     new SLOsImpl(Api.honeycombClient(client, apiKey), dataset, baseUri)
 
   private class SLOsImpl[F[_]: Concurrent](
@@ -32,19 +32,19 @@ object SLOs {
     baseUri: Uri
   ) extends SLOs[F]{
     def create(name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String): F[SLO] = 
-      client.expectOr(Request[F](Method.POST, baseUri / "slos" / dataset).withEntity(ModifySLO(name, description, timePeriodDays, targetPerMillion, alias)))(resp => resp.as[CreationError].widen)
+      client.expectOr(Request[F](Method.POST, baseUri / "1" / "slos" / dataset).withEntity(ModifySLO(name, description, timePeriodDays, targetPerMillion, alias)))(resp => resp.as[CreationError].widen)
     
     def update(id: String, name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String): F[SLO] = 
-      client.expectOr(Request[F](Method.PUT, baseUri / "slos" / dataset / id).withEntity(ModifySLO(name, description, timePeriodDays, targetPerMillion, alias)))(resp => resp.as[CreationError].widen)
+      client.expectOr(Request[F](Method.PUT, baseUri / "1" / "slos" / dataset / id).withEntity(ModifySLO(name, description, timePeriodDays, targetPerMillion, alias)))(resp => resp.as[CreationError].widen)
 
     def get(id: String): F[Option[SLO]] = 
-      client.expectOption[SLO](Request[F](Method.GET, baseUri / "slos" / dataset / id))
+      client.expectOption[SLO](Request[F](Method.GET, baseUri / "1" / "slos" / dataset / id))
     
     def delete(id: String): F[Boolean] = 
-      client.successful(Request[F](Method.DELETE, baseUri / "slos" / dataset / id))
+      client.successful(Request[F](Method.DELETE, baseUri / "1" / "slos" / dataset / id))
     
     def list: F[List[SLO]] = 
-      client.expect(Request[F](Method.GET, baseUri / "slos" / dataset))
+      client.expect(Request[F](Method.GET, baseUri / "1" / "slos" / dataset))
   }
 
   case class ModifySLO(name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String)
