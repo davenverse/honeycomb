@@ -36,7 +36,7 @@ trait Markers[F[_]]{
 }
 
 object Markers {
-  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, dataset: String, baseUri: Uri = uri"https://api.honeycomb.io/1"): Markers[F] = {
+  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, dataset: String, baseUri: Uri = uri"https://api.honeycomb.io"): Markers[F] = {
     new MarkersImpl[F](Api.honeycombClient(client, apiKey), dataset, baseUri)
   }
 
@@ -46,16 +46,16 @@ object Markers {
     baseUri: Uri
   ) extends Markers[F]{
     def create(message: String, startTime: Option[Long], endTime: Option[Long], `type`: Option[String], url: Option[String]): F[Marker] = 
-      client.expect(Request[F](Method.POST, baseUri / "markers" / dataset).withEntity(MarkerModify(message.some, startTime, endTime, `type`, url)))
+      client.expect(Request[F](Method.POST, baseUri / "1" / "markers" / dataset).withEntity(MarkerModify(message.some, startTime, endTime, `type`, url)))
     
     def update(id: String, message: Option[String], startTime: Option[Long], endTime: Option[Long], `type`: Option[String], url: Option[String]): F[Marker] = 
-      client.expect(Request[F](Method.PUT, baseUri / "markers" / dataset / id))
+      client.expect(Request[F](Method.PUT, baseUri / "1" / "markers" / dataset / id))
     
     def delete(id: String): F[Boolean] = 
-      client.successful(Request[F](Method.DELETE, baseUri / "markers" / dataset / id))
+      client.successful(Request[F](Method.DELETE, baseUri / "1" / "markers" / dataset / id))
     
     def list: F[List[Marker]] = 
-      client.expect(Request[F](Method.GET, baseUri / "markers" / dataset))
+      client.expect(Request[F](Method.GET, baseUri / "1" / "markers" / dataset))
     
   }
 

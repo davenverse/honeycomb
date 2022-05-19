@@ -18,7 +18,7 @@ trait Columns[F[_]]{
 }
 object Columns {
 
-  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, dataset: String, baseUri: Uri = uri"https://api.honeycomb.io/1"): Columns[F] = 
+  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, dataset: String, baseUri: Uri = uri"https://api.honeycomb.io"): Columns[F] = 
     new ColumnsImpl(Api.honeycombClient(client, apiKey), dataset, baseUri)
 
   private class ColumnsImpl[F[_]: Concurrent](
@@ -27,13 +27,13 @@ object Columns {
     baseUri: Uri
   ) extends Columns[F]{
     def getById(id: String): F[Option[Column]] = 
-      client.expectOption(Request[F](Method.GET, baseUri / "columns" / dataset / id))
+      client.expectOption(Request[F](Method.GET, baseUri / "1" / "columns" / dataset / id))
     
     def getByKeyName(keyname: String): F[Option[Column]] = 
-      client.expectOption(Request[F](Method.GET, (baseUri / "columns" / dataset).withQueryParam("key_name", keyname)))
+      client.expectOption(Request[F](Method.GET, (baseUri / "1" / "columns" / dataset).withQueryParam("key_name", keyname)))
     
     def list: F[List[Column]] = 
-      client.expect(Request[F](Method.GET, baseUri / "columns" / dataset))
+      client.expect(Request[F](Method.GET, baseUri / "1" / "columns" / dataset))
     
   }
 

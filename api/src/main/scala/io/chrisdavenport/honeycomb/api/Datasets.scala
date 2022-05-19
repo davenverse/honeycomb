@@ -18,7 +18,7 @@ trait Datasets[F[_]]{
 }
 object Datasets {
 
-  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, baseUri: Uri = uri"https://api.honeycomb.io/1"): Datasets[F] = 
+  def impl[F[_]: Concurrent](client: Client[F], apiKey: String, baseUri: Uri = uri"https://api.honeycomb.io"): Datasets[F] = 
     new DatasetsImpl(Api.honeycombClient(client, apiKey), baseUri)
 
   private class DatasetsImpl[F[_]: Concurrent](
@@ -26,13 +26,13 @@ object Datasets {
     baseUri: Uri
   ) extends Datasets[F]{
     def create(name: String): F[Dataset] =
-      client.expect[Dataset](Request[F](Method.POST, baseUri / "datasets").withEntity(Json.obj("name" -> name.asJson)))
+      client.expect[Dataset](Request[F](Method.POST, baseUri / "1" / "datasets").withEntity(Json.obj("name" -> name.asJson)))
     
     def get(dataset: String): F[Option[Dataset]] = 
-      client.expectOption(Request[F](Method.GET, baseUri / "datasets" / dataset))
+      client.expectOption(Request[F](Method.GET, baseUri / "1" / "datasets" / dataset))
     
     def list: F[List[Dataset]] = 
-      client.expect(Request[F](Method.GET, baseUri / "datasets"))
+      client.expect(Request[F](Method.GET, baseUri / "1" / "datasets"))
     
   }
 

@@ -27,7 +27,7 @@ val munitCatsEffectV = "1.0.7"
 
 // Projects
 lazy val `honeycomb` = tlCrossRootProject
-  .aggregate(api)
+  .aggregate(api, examples)
 
 lazy val api = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
@@ -43,9 +43,10 @@ lazy val api = crossProject(JVMPlatform, JSPlatform)
       "co.fs2"                      %%% "fs2-io"                     % fs2V,
 
       "org.http4s"                  %%% "http4s-dsl"                 % http4sV,
-      "org.http4s"                  %%% "http4s-ember-server"        % http4sV,
       "org.http4s"                  %%% "http4s-ember-client"        % http4sV,
       "org.http4s"                  %%% "http4s-circe"               % http4sV,
+
+      "io.chrisdavenport"           %%% "env"                        % "0.1.0",
 
       "io.circe"                    %%% "circe-core"                 % circeV,
       "io.circe"                    %%% "circe-generic"              % circeV,
@@ -57,6 +58,10 @@ lazy val api = crossProject(JVMPlatform, JSPlatform)
   ).jsSettings(
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule)},
   )
+
+lazy val examples = project.in(file("examples"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(api.jvm)
 
 lazy val site = project.in(file("site"))
   .enablePlugins(TypelevelSitePlugin)
