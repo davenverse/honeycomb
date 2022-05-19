@@ -81,7 +81,9 @@ object SLOs {
   }
 
   case class ErrorDetail(field: String, code: String, description: String)
-  object ErrorDetail{ implicit val decoder: Decoder[ErrorDetail] = io.circe.generic.semiauto.deriveDecoder}
+  object ErrorDetail{
+    implicit val decoder: Decoder[ErrorDetail] = io.circe.generic.semiauto.deriveDecoder
+  }
 
   case class CreationError(status: Int, `type`: String, title: String, typeDetail: List[ErrorDetail], error: String)
     extends RuntimeException(s"Failed To Create SLO, status: $status type: ${`type`} title: $title typeDetail: $typeDetail error: $error")
