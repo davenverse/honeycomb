@@ -10,8 +10,8 @@ import io.circe.Decoder
 
 trait DerivedColumns[F[_]]{
   import DerivedColumns._
-  def create(create: ModifyDerivedColumn): F[DerivedColumn]
-  def update(id: String, update: ModifyDerivedColumn): F[DerivedColumn]
+  def create(alias: String, description: String, expression: String): F[DerivedColumn]
+  def update(id: String, alias: String, description: String, expression: String): F[DerivedColumn]
   def delete(id: String): F[Boolean]
   def getById(id: String): F[Option[DerivedColumn]]
   def getByAlias(alias: String): F[Option[DerivedColumn]]
@@ -28,11 +28,11 @@ object DerivedColumns{
     dataset: String,
     baseUri: Uri
   ) extends DerivedColumns[F]{
-    def create(create: ModifyDerivedColumn): F[DerivedColumn] = 
-      client.expect(Request[F](Method.POST, baseUri / "derived_columns" / dataset).withEntity(create))
+    def create(alias: String, description: String, expression: String): F[DerivedColumn] = 
+      client.expect(Request[F](Method.POST, baseUri / "derived_columns" / dataset).withEntity(ModifyDerivedColumn(alias, description, expression)))
     
-    def update(id: String, update: ModifyDerivedColumn): F[DerivedColumn] = 
-      client.expect(Request[F](Method.PUT, baseUri / "derived_columns" / dataset / id).withEntity(update))
+    def update(id: String, alias: String, description: String, expression: String): F[DerivedColumn] = 
+      client.expect(Request[F](Method.PUT, baseUri / "derived_columns" / dataset / id).withEntity(ModifyDerivedColumn(alias, description, expression)))
     
     def delete(id: String): F[Boolean] = 
       client.successful(Request[F](Method.DELETE, baseUri / "derived_columns" / dataset / id))

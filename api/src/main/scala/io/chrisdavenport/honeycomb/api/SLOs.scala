@@ -15,8 +15,8 @@ import io.circe.HCursor
 
 trait SLOs[F[_]]{
   import SLOs._
-  def create(create: ModifySLO): F[SLO]
-  def update(id: String, modify: ModifySLO): F[SLO]
+  def create(name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String): F[SLO]
+  def update(id: String, name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String): F[SLO]
   def get(id: String): F[Option[SLO]]
   def delete(id: String): F[Boolean]
   def list: F[List[SLO]]
@@ -31,11 +31,11 @@ object SLOs {
     dataset: String,
     baseUri: Uri
   ) extends SLOs[F]{
-    def create(create: ModifySLO): F[SLO] = 
-      client.expectOr(Request[F](Method.POST, baseUri / "slos" / dataset).withEntity(create))(resp => resp.as[CreationError].widen)
+    def create(name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String): F[SLO] = 
+      client.expectOr(Request[F](Method.POST, baseUri / "slos" / dataset).withEntity(ModifySLO(name, description, timePeriodDays, targetPerMillion, alias)))(resp => resp.as[CreationError].widen)
     
-    def update(id: String, modify: ModifySLO): F[SLO] = 
-      client.expectOr(Request[F](Method.PUT, baseUri / "slos" / dataset / id).withEntity(modify))(resp => resp.as[CreationError].widen)
+    def update(id: String, name: String, description: String, timePeriodDays: Int, targetPerMillion: Int, alias: String): F[SLO] = 
+      client.expectOr(Request[F](Method.PUT, baseUri / "slos" / dataset / id).withEntity(ModifySLO(name, description, timePeriodDays, targetPerMillion, alias)))(resp => resp.as[CreationError].widen)
 
     def get(id: String): F[Option[SLO]] = 
       client.expectOption[SLO](Request[F](Method.GET, baseUri / "slos" / dataset / id))
