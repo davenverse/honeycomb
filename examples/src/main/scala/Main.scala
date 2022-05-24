@@ -8,9 +8,13 @@ object Main extends IOApp {
 
   // Remember to set your HONEYCOMB_TOKEN environment variable
   def run(args: List[String]): IO[ExitCode] = Api.default[IO]().use{ api =>
-    api.datasetApi("production").derivedColumns
-      .list
-      .flatMap(_.traverse(IO.println))
+    val ds = api.datasetApi("production")
+    val _ = ds
+    // GET Id for notifications
+    // Create Derived Column
+    // Create SLO
+    // Create Burn Alerts for SLO with notification id
+    IO.unit
       .as(ExitCode.Success)
   }
 

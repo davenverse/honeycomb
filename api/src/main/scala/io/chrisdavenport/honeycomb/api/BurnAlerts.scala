@@ -14,8 +14,8 @@ import io.circe.Json
 
 trait BurnAlerts[F[_]]{
   import BurnAlerts._
-  def create(sloId: String, exhaustionMinutes: Int): F[BurnAlert]
-  def modify(id: String, exhaustionMinutes: Int): F[BurnAlert]
+  def create(sloId: String, exhaustionMinutes: Int, recipient: Option[List[Recipient]]): F[BurnAlert]
+  def modify(id: String, exhaustionMinutes: Int, recipient: Option[List[Recipient]]): F[BurnAlert]
   def delete(id: String): F[Boolean]
   def get(id: String): F[Option[BurnAlert]]
   def getAllForSLO(sloId: String): F[List[BurnAlert]]
@@ -35,15 +35,15 @@ object BurnAlerts {
     dataset: String,
     baseUri: Uri
   ) extends BurnAlerts[F]{
-    def create(sloId: String, exhaustionMinutes: Int): F[BurnAlert] = 
-      client.expectOr(Request[F](Method.GET, baseUri / "1" / "burn_alerts" / dataset).withEntity(ModifyBurnAlert(sloId, exhaustionMinutes)))(_.as[BurnAlertError].widen)
+    def create(sloId: String, exhaustionMinutes: Int, recipients: Option[List[Recipient]]): F[BurnAlert] = 
+      client.expectOr(Request[F](Method.GET, baseUri / "1" / "burn_alerts" / dataset).withEntity(ModifyBurnAlert(sloId, exhaustionMinutes, recipients)))(_.as[BurnAlertError].widen)
 
     def delete(id: String): F[Boolean] = 
       client.successful(Request[F](Method.DELETE, baseUri / "1" / "burn_alerts" / dataset / id))
 
     
-    def modify(id: String, exhaustionMinutes: Int): F[BurnAlert] = 
-      client.expectOr(Request[F](Method.PUT, baseUri / "1" / "burn_alerts" / dataset / id).withEntity(Json.obj("exhaustion_minutes" -> exhaustionMinutes.asJson)))(_.as[BurnAlertError].widen)
+    def modify(id: String, exhaustionMinutes: Int, recipients: Option[List[Recipient]]): F[BurnAlert] = 
+      client.expectOr(Request[F](Method.PUT, baseUri / "1" / "burn_alerts" / dataset / id).withEntity(Json.obj("exhaustion_minutes" -> exhaustionMinutes.asJson, "recipients" -> recipients.asJson)))(_.as[BurnAlertError].widen)
     
     def get(id: String): F[Option[BurnAlert]] = 
       client.expectOption(Request[F](Method.GET, baseUri / "1" / "burn_alerts" / dataset / id))
@@ -53,7 +53,12 @@ object BurnAlerts {
     
   }
 
-  case class BurnAlert(id: String, exhaustionMinutes: Int, createdAt: String, updatedAt: String, sloId: String)
+  case class Recipient(`type`: String, target: String, id: String)
+  object Recipient {
+    implicit val codec: io.circe.Codec[Recipient] = io.circe.generic.semiauto.deriveCodec
+  }
+
+  case class BurnAlert(id: String, exhaustionMinutes: Int, createdAt: String, updatedAt: String, sloId: String, recipients: Option[List[Recipient]])
   object BurnAlert {
     implicit val decoder: Decoder[BurnAlert] = new Decoder[BurnAlert]{
       def apply(c: HCursor): Decoder.Result[BurnAlert] = (
@@ -61,19 +66,21 @@ object BurnAlerts {
         c.downField("exhaustion_minutes").as[Int],
         c.downField("created_at").as[String],
         c.downField("updated_at").as[String],
-        c.downField("slo").downField("id").as[String]
+        c.downField("slo").downField("id").as[String],
+        c.downField("recipients").as[Option[List[Recipient]]]
       ).mapN(BurnAlert.apply)
     }
   }
 
-  private case class ModifyBurnAlert(sloId: String, exhaustionMinutes: Int)
+  private case class ModifyBurnAlert(sloId: String, exhaustionMinutes: Int, recipients: Option[List[Recipient]])
   private object ModifyBurnAlert {
     implicit val encoder: Encoder[ModifyBurnAlert] = new Encoder[ModifyBurnAlert]{
       def apply(a: ModifyBurnAlert): Json = Json.obj(
         "slo" -> Json.obj(
           "id" -> a.sloId.asJson
         ),
-        "exhaustion_minutes" -> a.exhaustionMinutes.asJson
+        "exhaustion_minutes" -> a.exhaustionMinutes.asJson,
+        "recipients" -> a.recipients.asJson
       )
     }
   }
