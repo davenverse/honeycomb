@@ -22,7 +22,7 @@ val catsEffectV = "3.3.11"
 val fs2V = "3.2.7"
 val http4sV = "0.23.11"
 val circeV = "0.14.1"
-val munitCatsEffectV = "1.0.7"
+val munitCatsEffectV = "2.0.0"
 
 
 // Projects
@@ -52,7 +52,7 @@ lazy val api = crossProject(JVMPlatform, JSPlatform)
       "io.circe"                    %%% "circe-generic"              % circeV,
       "io.circe"                    %%% "circe-parser"               % circeV                   % Test,
 
-      "org.typelevel"               %%% "munit-cats-effect-3"        % munitCatsEffectV         % Test,
+      "org.typelevel"               %%% "munit-cats-effect"        % munitCatsEffectV         % Test,
 
     )
   ).jsSettings(
