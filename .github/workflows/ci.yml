@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        scala: [2.12, 2.13, 3]
+        scala: [2.13, 3]
         java: [temurin@8]
         project: [honeycombJVM, honeycombJS]
     runs-on: ${{ matrix.os }}
@@ -118,26 +118,6 @@ jobs:
       - name: sbt update
         if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
         run: sbt +update
-
-      - name: Download target directories (2.12, honeycombJVM)
-        uses: actions/download-artifact@v6
-        with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-honeycombJVM
-
-      - name: Inflate target directories (2.12, honeycombJVM)
-        run: |
-          tar xf targets.tar
-          rm targets.tar
-
-      - name: Download target directories (2.12, honeycombJS)
-        uses: actions/download-artifact@v6
-        with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-honeycombJS
-
-      - name: Inflate target directories (2.12, honeycombJS)
-        run: |
-          tar xf targets.tar
-          rm targets.tar
 
       - name: Download target directories (2.13, honeycombJVM)
         uses: actions/download-artifact@v6
@@ -236,7 +216,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: examples_2.12 examples_2.13 examples_3 site_2.12 site_2.13 site_3 honeycombjvm_2.12 honeycombjvm_2.13 honeycombjvm_3 honeycombnative_2.12 honeycombnative_2.13 honeycombnative_3 honeycombjs_2.12 honeycombjs_2.13 honeycombjs_3
+          modules-ignore: examples_2.13 examples_3 site_2.13 site_3 honeycombjvm_2.13 honeycombjvm_3 honeycombnative_2.13 honeycombnative_3 honeycombjs_2.13 honeycombjs_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   site:
